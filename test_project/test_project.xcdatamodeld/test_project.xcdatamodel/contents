@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="11232" systemVersion="15G31" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Category" representedClassName=".Category" syncable="YES">
+        <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="subs" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Sub" inverseName="category" inverseEntity="Sub" syncable="YES"/>
+    </entity>
+    <entity name="Sub" representedClassName=".Sub" syncable="YES">
+        <attribute name="id" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="category" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Category" inverseName="subs" inverseEntity="Category" syncable="YES"/>
+        <relationship name="subs" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Sub" inverseName="subs" inverseEntity="Sub" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="Sub" positionX="225" positionY="-78" width="128" height="105"/>
+        <element name="Category" positionX="-54" positionY="9" width="128" height="73"/>
+    </elements>
+</model>
