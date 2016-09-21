@@ -90,39 +90,9 @@ class SecondViewController: UIViewController, UITextFieldDelegate {
                     if let dict = json as? [Dictionary<String, AnyObject>] {
                         //Добавление категорий
                         for cat in dict {
-                            let entity = NSEntityDescription.entity(forEntityName: "Category", in: self.context)
-                            let categoryObj = Category(entity: entity!, insertInto: self.context)
-                            if let title = cat["title"] as? String {
-                                categoryObj.title = title
-                            }
-                            //Если у категории есть подкатегории, то добавляем их
-                            if let subs = cat["subs"] as? [Dictionary<String, AnyObject>] {
-                                for sub in subs {
-                                    let subObj = self.createSubObj(sub: sub)
-                                    //Добавлем к подкатегориям, еще подкатегории, используя обход в глубину
-                                    //В конкретном случае можно было его не использовать, однако в теории подкатегории, могли бы иметь еще несколько уровней,
-                                    //содержащих объекты subs
-                                    self.dfs_sub_add(sub: sub, subObj: subObj)
-                                    
-                                    categoryObj.addToSubs(subObj)
-                                }
-                            }
-                            self.context.insert(categoryObj)
+                            self.add_cat(cat: cat)
                         }
-                        privateMOC.perform {
-                            do {
-                                try privateMOC.save()
-                                self.context.performAndWait {
-                                    do {
-                                        try self.context.save()
-                                    } catch {
-                                        fatalError("Failure to save context: \(error)")
-                                    }
-                                }
-                            } catch {
-                                fatalError("Failure to save context: \(error)")
-                            }
-                        }
+                        self.saveData(privateMOC: privateMOC)
                     }
                 } catch {
                     print("Couldn't serialize")
@@ -155,6 +125,44 @@ class SecondViewController: UIViewController, UITextFieldDelegate {
         } catch {
             print ("Couldn't fetch")
         }
+    }
+    
+    func saveData(privateMOC: NSManagedObjectContext){
+        privateMOC.perform {
+            do {
+                try privateMOC.save()
+                self.context.performAndWait {
+                    do {
+                        try self.context.save()
+                    } catch {
+                        fatalError("Failure to save context: \(error)")
+                    }
+                }
+            } catch {
+                fatalError("Failure to save context: \(error)")
+            }
+        }
+    }
+    
+    func add_cat (cat: Dictionary<String, AnyObject>) {
+        let entity = NSEntityDescription.entity(forEntityName: "Category", in: self.context)
+        let categoryObj = Category(entity: entity!, insertInto: self.context)
+        if let title = cat["title"] as? String {
+            categoryObj.title = title
+        }
+        //Если у категории есть подкатегории, то добавляем их
+        if let subs = cat["subs"] as? [Dictionary<String, AnyObject>] {
+            for sub in subs {
+                let subObj = self.createSubObj(sub: sub)
+                //Добавлем к подкатегориям, еще подкатегории, используя обход в глубину
+                //В конкретном случае можно было его не использовать, однако в теории подкатегории, могли бы иметь еще несколько уровней,
+                //содержащих объекты subs
+                self.dfs_sub_add(sub: sub, subObj: subObj)
+                
+                categoryObj.addToSubs(subObj)
+            }
+        }
+        self.context.insert(categoryObj)
     }
     
     //Добавление подкатегорий, используя обход в глубину
